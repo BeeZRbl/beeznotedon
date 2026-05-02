@@ -1,4 +1,5 @@
 -- ULTRA FIX LAG + LOADING UI
+-- LocalScript: đặt vào StarterPlayerScripts
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Lighting = game:GetService("Lighting")
@@ -213,7 +214,7 @@ local function doFixLag()
         end
     end)
 
-    -- ===== LOAD NOTE + JOBJID UI =====
+    -- ===== NOTE + JOBID UI =====
     local Players2 = game:GetService("Players")
     local player2 = Players2.LocalPlayer
     local playerGui2 = player2:WaitForChild("PlayerGui")
@@ -228,14 +229,6 @@ local function doFixLag()
         getgenv().SavedText = readfile(fileName)
     else
         getgenv().SavedText = ""
-    end
-
-    local function getGameName()
-        local name = "Unknown Game"
-        pcall(function()
-            name = MarketplaceService:GetProductInfo(game.PlaceId).Name
-        end)
-        return name
     end
 
     local Images = {}
@@ -518,39 +511,53 @@ local function doFixLag()
     end
     switch(1)
 
-    -- TOGGLE
+    -- ===== TOGGLE BUTTON (hình TRÒN) =====
     local toggle = Instance.new("TextButton", gui)
     toggle.Size = UDim2.new(0, 60, 0, 60)
     toggle.Position = UDim2.new(1, -80, 1, -80)
-    toggle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    toggle.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    toggle.BackgroundTransparency = 0.3
     toggle.Text = ""
     toggle.BorderSizePixel = 0
-    Instance.new("UICorner", toggle).CornerRadius = UDim.new(1, 0)
+    toggle.ClipsDescendants = true  -- clip ảnh theo hình tròn
+
+    -- Bo tròn hoàn hảo
+    local toggleCorner = Instance.new("UICorner", toggle)
+    toggleCorner.CornerRadius = UDim.new(0, 9999)
+
     local toggleStroke = Instance.new("UIStroke", toggle)
     toggleStroke.Color = Color3.fromRGB(255, 215, 0)
     toggleStroke.Thickness = 2
 
     local toggleIcon = Instance.new("ImageLabel", toggle)
-    toggleIcon.Size = UDim2.new(0, 40, 0, 40)
-    toggleIcon.Position = UDim2.new(0.5, -20, 0.5, -20)
+    toggleIcon.Size = UDim2.new(1, 0, 1, 0)
+    toggleIcon.Position = UDim2.new(0, 0, 0, 0)
     toggleIcon.BackgroundTransparency = 1
-    toggleIcon.Image = Images["activity"] or ""
-    toggleIcon.ImageColor3 = Color3.fromRGB(0, 0, 0)
+    toggleIcon.Image = "rbxassetid://135314302105271"
+    toggleIcon.ScaleType = Enum.ScaleType.Fit
 
+    -- Drag toggle
+    local UIS2 = game:GetService("UserInputService")
     local dragging2 = false
     local startPos2, startFramePos2
+    local dragThreshold = 5
+    local dragMoved = false
 
     toggle.InputBegan:Connect(function(i)
         if i.UserInputType == Enum.UserInputType.MouseButton1 then
             dragging2 = true
+            dragMoved = false
             startPos2 = i.Position
             startFramePos2 = toggle.Position
         end
     end)
 
-    UIS.InputChanged:Connect(function(i)
+    UIS2.InputChanged:Connect(function(i)
         if dragging2 and i.UserInputType == Enum.UserInputType.MouseMovement then
             local delta = i.Position - startPos2
+            if math.abs(delta.X) > dragThreshold or math.abs(delta.Y) > dragThreshold then
+                dragMoved = true
+            end
             toggle.Position = UDim2.new(
                 startFramePos2.X.Scale,
                 startFramePos2.X.Offset + delta.X,
@@ -560,7 +567,7 @@ local function doFixLag()
         end
     end)
 
-    UIS.InputEnded:Connect(function(i)
+    UIS2.InputEnded:Connect(function(i)
         if i.UserInputType == Enum.UserInputType.MouseButton1 then
             dragging2 = false
         end
@@ -568,11 +575,13 @@ local function doFixLag()
 
     local visible = true
     toggle.MouseButton1Click:Connect(function()
-        visible = not visible
-        main.Visible = visible
+        if not dragMoved then
+            visible = not visible
+            main.Visible = visible
+        end
     end)
 
-    -- FPS + PING LABEL
+    -- ===== FPS + PING LABEL =====
     local statsLabel = Instance.new("TextLabel", gui)
     statsLabel.Position = UDim2.new(0, 10, 0, 60)
     statsLabel.Size = UDim2.new(0, 150, 0, 50)
@@ -608,6 +617,7 @@ local function doFixLag()
         end
     end)
 
+    -- ===== BLOX FRUITS AUTO LOAD =====
     local BloxFruits_IDs = {
         [27539155] = true, [2753915549] = true, [85211729168715] = true,
         [4442272187] = true, [4442272183] = true, [79091703265657] = true,
