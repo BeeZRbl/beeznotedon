@@ -236,6 +236,7 @@ local function doFixLag()
 
     local gui = Instance.new("ScreenGui", playerGui2)
     gui.Name = "BangdonUI"
+    gui.ResetOnSpawn = false
 
     local main = Instance.new("Frame", gui)
     main.Size = UDim2.new(0, 400, 0, 180)
